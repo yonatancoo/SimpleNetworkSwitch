@@ -1,5 +1,4 @@
 import socket
-import struct
 from typing import Tuple
 import selectors
 
@@ -12,12 +11,12 @@ MAX_PACKET_SIZE = 65535
 BROADCAST_ADDRESS = "ff:ff:ff:ff:ff:ff"
 
 def get_mac_addresses(bytes) -> Tuple[str, str]:
-    eth_header = bytes[:14]
-    dest_mac, src_mac, ethertype = struct.unpack('!6s6sH', eth_header)
+    dest_mac_bytes = bytes[:6]
+    src_mac_bytes = bytes[6:12]
 
     # Format MAC addresses as human-readable strings
-    dest_mac = ':'.join(f'{b:02x}' for b in dest_mac)
-    src_mac = ':'.join(f'{b:02x}' for b in src_mac)
+    dest_mac = ':'.join(f'{b:02x}' for b in dest_mac_bytes)
+    src_mac = ':'.join(f'{b:02x}' for b in src_mac_bytes)
     
     return (src_mac, dest_mac)
             
@@ -37,6 +36,7 @@ for interface in interfaces:
     initialize_packet_event(interface)
 
 def broadcast():
+    print("Mac address is unknown, broadcasting!")
     for sock in all_socks:
         sock.send(packet_bytes)
 
